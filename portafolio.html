@@ -1,0 +1,615 @@
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Portafolio — Sistemas Operativos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:        #080c14;
+      --surface:   #0e1420;
+      --card:      #121926;
+      --border:    #1e2d42;
+      --accent1:   #00e5ff;
+      --accent2:   #7c3aed;
+      --accent3:   #f97316;
+      --text:      #e2eaf6;
+      --muted:     #5a7190;
+      --u1:        #00e5ff;
+      --u2:        #a78bfa;
+      --u3:        #fb923c;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0;
+      opacity: .4;
+    }
+
+    /* ── GRID BG ── */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(0,229,255,.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,255,.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative; z-index: 1;
+      padding: 5rem 2rem 4rem;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .hero-glow {
+      position: absolute;
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      top: -200px; left: 50%;
+      transform: translateX(-50%);
+      background: radial-gradient(circle, rgba(0,229,255,.12) 0%, transparent 70%);
+      pointer-events: none;
+      animation: pulse 6s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%,100% { transform: translateX(-50%) scale(1); opacity: .6; }
+      50%      { transform: translateX(-50%) scale(1.15); opacity: 1; }
+    }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: rgba(0,229,255,.08);
+      border: 1px solid rgba(0,229,255,.25);
+      border-radius: 999px;
+      padding: .35rem 1rem;
+      font-family: 'Space Mono', monospace;
+      font-size: .72rem;
+      color: var(--accent1);
+      letter-spacing: .08em;
+      margin-bottom: 1.5rem;
+      animation: fadeDown .6s ease both;
+    }
+    .badge::before { content: '●'; font-size: .5rem; animation: blink 1.2s step-end infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    h1 {
+      font-size: clamp(2.4rem, 6vw, 4.5rem);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -.02em;
+      animation: fadeDown .7s .1s ease both;
+    }
+
+    h1 span {
+      background: linear-gradient(135deg, var(--accent1) 0%, var(--accent2) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-sub {
+      margin-top: 1.2rem;
+      color: var(--muted);
+      font-size: 1rem;
+      font-family: 'Space Mono', monospace;
+      animation: fadeDown .8s .2s ease both;
+    }
+
+    .stats {
+      display: flex; justify-content: center; gap: 2.5rem;
+      margin-top: 2.5rem;
+      animation: fadeDown .9s .3s ease both;
+    }
+    .stat { text-align: center; }
+    .stat-num {
+      font-size: 2rem; font-weight: 800;
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .stat-label { font-size: .75rem; color: var(--muted); margin-top: .2rem; font-family: 'Space Mono', monospace; letter-spacing: .06em; }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── MAIN ── */
+    main {
+      position: relative; z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 6rem;
+    }
+
+    /* ── UNIT SECTION ── */
+    .unit {
+      margin-bottom: 4.5rem;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity .6s ease, transform .6s ease;
+    }
+    .unit.visible { opacity: 1; transform: translateY(0); }
+
+    .unit-header {
+      display: flex; align-items: center; gap: 1.2rem;
+      margin-bottom: 2rem;
+    }
+
+    .unit-pill {
+      font-family: 'Space Mono', monospace;
+      font-size: .7rem;
+      letter-spacing: .12em;
+      padding: .4rem .9rem;
+      border-radius: 999px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .unit-1 .unit-pill { background: rgba(0,229,255,.12); color: var(--u1); border: 1px solid rgba(0,229,255,.3); }
+    .unit-2 .unit-pill { background: rgba(167,139,250,.12); color: var(--u2); border: 1px solid rgba(167,139,250,.3); }
+    .unit-3 .unit-pill { background: rgba(251,146,60,.12);  color: var(--u3); border: 1px solid rgba(251,146,60,.3); }
+
+    .unit-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: -.01em;
+    }
+
+    .unit-line {
+      flex: 1;
+      height: 1px;
+    }
+    .unit-1 .unit-line { background: linear-gradient(90deg, rgba(0,229,255,.3), transparent); }
+    .unit-2 .unit-line { background: linear-gradient(90deg, rgba(167,139,250,.3), transparent); }
+    .unit-3 .unit-line { background: linear-gradient(90deg, rgba(251,146,60,.3), transparent); }
+
+    /* ── GRID ── */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.2rem;
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.5rem;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      gap: .8rem;
+      position: relative;
+      overflow: hidden;
+      transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity .3s ease;
+      border-radius: inherit;
+    }
+
+    .unit-1 .card::before { background: radial-gradient(circle at top left, rgba(0,229,255,.07), transparent 60%); }
+    .unit-2 .card::before { background: radial-gradient(circle at top left, rgba(167,139,250,.07), transparent 60%); }
+    .unit-3 .card::before { background: radial-gradient(circle at top left, rgba(251,146,60,.07), transparent 60%); }
+
+    .card:hover {
+      transform: translateY(-4px);
+    }
+    .card:hover::before { opacity: 1; }
+
+    .unit-1 .card:hover { border-color: rgba(0,229,255,.45); box-shadow: 0 8px 32px rgba(0,229,255,.1); }
+    .unit-2 .card:hover { border-color: rgba(167,139,250,.45); box-shadow: 0 8px 32px rgba(167,139,250,.1); }
+    .unit-3 .card:hover { border-color: rgba(251,146,60,.45);  box-shadow: 0 8px 32px rgba(251,146,60,.1); }
+
+    .card-top {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    .act-num {
+      font-family: 'Space Mono', monospace;
+      font-size: .7rem;
+      font-weight: 700;
+      padding: .28rem .65rem;
+      border-radius: 6px;
+      letter-spacing: .06em;
+    }
+    .unit-1 .act-num { background: rgba(0,229,255,.1); color: var(--u1); }
+    .unit-2 .act-num { background: rgba(167,139,250,.1); color: var(--u2); }
+    .unit-3 .act-num { background: rgba(251,146,60,.1);  color: var(--u3); }
+
+    .card-arrow {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .85rem;
+      transition: transform .25s ease, background .25s ease;
+    }
+    .unit-1 .card-arrow { background: rgba(0,229,255,.08); color: var(--u1); }
+    .unit-2 .card-arrow { background: rgba(167,139,250,.08); color: var(--u2); }
+    .unit-3 .card-arrow { background: rgba(251,146,60,.08);  color: var(--u3); }
+    .card:hover .card-arrow { transform: translate(2px, -2px); }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 600;
+      line-height: 1.35;
+      letter-spacing: -.01em;
+    }
+
+    .card-desc {
+      font-size: .82rem;
+      color: var(--muted);
+      line-height: 1.6;
+      flex: 1;
+    }
+
+    .card-footer {
+      display: flex; align-items: center; gap: .5rem;
+      padding-top: .8rem;
+      border-top: 1px solid var(--border);
+      font-family: 'Space Mono', monospace;
+      font-size: .68rem;
+    }
+    .unit-1 .card-footer { color: var(--u1); }
+    .unit-2 .card-footer { color: var(--u2); }
+    .unit-3 .card-footer { color: var(--u3); }
+    .card-footer svg { flex-shrink: 0; }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative; z-index: 1;
+      text-align: center;
+      padding: 2rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-family: 'Space Mono', monospace;
+      font-size: .72rem;
+      letter-spacing: .06em;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="hero-glow"></div>
+    <div class="badge">PORTAFOLIO DE ACTIVIDADES</div>
+    <h1>Sistemas<br/><span>Operativos</span></h1>
+    <p class="hero-sub">// 3 unidades &nbsp;·&nbsp; 17 actividades &nbsp;·&nbsp; un semestre</p>
+    <div class="stats">
+      <div class="stat"><div class="stat-num">3</div><div class="stat-label">UNIDADES</div></div>
+      <div class="stat"><div class="stat-num">17</div><div class="stat-label">ACTIVIDADES</div></div>
+      <div class="stat"><div class="stat-num">∞</div><div class="stat-label">APRENDIZAJE</div></div>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ══════════════ UNIDAD 1 ══════════════ -->
+    <section class="unit unit-1">
+      <div class="unit-header">
+        <span class="unit-pill">UNIDAD 01</span>
+        <h2 class="unit-title">Fundamentos de Sistemas Operativos</h2>
+        <div class="unit-line"></div>
+      </div>
+
+      <div class="cards-grid">
+
+        <a class="card" href="https://drive.google.com/ACTIVIDAD_1" target="_blank" rel="noopener">
+          <div class="card-top">
+            <span class="act-num">ACT-01</span>
+            <div class="card-arrow">↗</div>
+          </div>
+          <div class="card-title">Introducción a los Sistemas Operativos</div>
+          <div class="card-desc">Conceptos fundamentales, historia y evolución de los SO. Análisis de las funciones principales que desempeña el sistema operativo en un equipo de cómputo.</div>
+          <div class="card-footer">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            Ver en Drive
+          </div>
+        </a>
+
+        <a class="card" href="https://drive.google.com/ACTIVIDAD_2" target="_blank" rel="noopener">
+          <div class="card-top">
+            <span class="act-num">ACT-02</span>
+            <div class="card-arrow">↗</div>
+          </div>
+          <div class="card-title">Tipos y Clasificación de SO</div>
+          <div class="card-desc">Comparativa entre sistemas operativos monotarea, multitarea, monousuario y multiusuario. Ejemplos prácticos con Windows, Linux y macOS.</div>
+          <div class="card-footer">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            Ver en Drive
+          </div>
+        </a>
+
+        <a class="card" href="https://drive.google.com/ACTIVIDAD_3" target="_blank" rel="noopener">
+          <div class="card-top">
+            <span class="act-num">ACT-03</span>
+            <div class="card-arrow">↗</div>
+          </div>
+          <div class="card-title">Estructura del Sistema Operativo</div>
+          <div class="card-desc">Estudio de la arquitectura interna: núcleo (kernel), shell, llamadas al sistema y la interfaz entre hardware y software de usuario.</div>
+          <div class="card-footer">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            Ver en Drive
+          </div>
+        </a>
+
+        <a class="card" href="https://drive.google.com/ACTIVIDAD_4" target="_blank" rel="noopener">
+          <div class="card-top">
+            <span class="act-num">ACT-04</span>
+            <div class="card-arrow">↗</div>
+          </div>
+          <div class="card-title">Gestión de Procesos</div>
+          <div class="card-desc">Ciclo de vida de un proceso, estados (nuevo, listo, ejecutando, bloqueado, terminado) y el bloque de control de proceso (PCB).</div>
+          <div class="card-footer">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            Ver en Drive
+          </div>
+        </a>
+
+        <a class="card" href="https://drive.google.com/ACTIVIDAD_5" target="_blank" rel="noopener">
+          <div class="card-top">
+            <span class="act-num">ACT-05</span>
+            <div class="card-arrow">↗</div>
+          </div>
+          <div class="card-title">Planificación de CPU</div>
+          <div class="card-desc">Algoritmos de planificación: FCFS, SJF, Round Robin y por prioridades. Análisis de tiempo de espera, retorno y respuesta en cada algoritmo.</div>
+          <div class="card-footer">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            Ver en Drive
+          </div>
+        </a>
+
+        <a class="card" href="https://drive.google.com/ACTIVIDAD_6" target="_blank" rel="noopener">
+          <div class="card-top">
+            <span class="act-num">ACT-06</span>
+            <div class="card-arrow">↗</div>
+          </div>
+          <div class="card-title">Hilos y Concurrencia</div>
+          <div class="card-desc">Diferencia entre procesos e hilos, modelos multihilo (usuario/kernel) y los beneficios de la programación concurrente en sistemas modernos.</div>
+          <div class="card-footer">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            Ver en Drive
+          </div>
+        </a>
+
+        <a class="card" href="https://drive.google.com/ACTIVIDAD_7" target="_blank" rel="noopener">
+          <div class="card-top">
+            <span class="act-num">ACT-07</span>
+            <div class="card-arrow">↗</div>
+          </div>
+          <div class="card-title">Sincronización de Procesos</div>
+          <div class="card-desc">Problema de sección crítica, semáforos, mutex y monitores. Soluciones clásicas: productor-consumidor, lectores-escritores y la cena de filósofos.</div>
+          <div class="card-footer">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            Ver en Drive
+          </div>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- ══════════════ UNIDAD 2 ══════════════ -->
+    <section class="unit unit-2">
+      <div class="unit-header">
+        <span class="unit-pill">UNIDAD 02</span>
+        <h2 class="unit-title">Gestión de Memoria y Almacenamiento</h2>
+        <div class="unit-line"></div>
+      </div>
+
+      <div class="cards-grid">
+
+        <a class="card" href="https://drive.google.com/ACTIVIDAD_8" target="_blank" rel="noopener">
+          <div class="card-top">
+            <span class="act-num">ACT-08</span>
+            <div class="card-arrow">↗</div>
+          </div>
+          <div class="card-title">Administración de Memoria</div>
+          <div class="card-desc">Organización de la memoria principal, particionamiento fijo y dinámico, fragmentación interna y externa, y compactación de memoria.</div>
+          <div class="card-footer">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            Ver en Drive
+          </div>
+        </a>
+
+        <a class="card" href="https://drive.google.com/ACTIVIDAD_9" target="_blank" rel="noopener">
+          <div class="card-top">
+            <span class="act-num">ACT-09</span>
+            <div class="card-arrow">↗</div>
+          </div>
+          <div class="card-title">Paginación y Segmentación</div>
+          <div class="card-desc">Técnicas de gestión de memoria virtual mediante paginación y segmentación. Tablas de páginas, bits de presencia y traducción de direcciones lógicas a físicas.</div>
+          <div class="card-footer">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            Ver en Drive
+          </div>
+        </a>
+
+        <a class="card" href="https://drive.google.com/ACTIVIDAD_10" target="_blank" rel="noopener">
+          <div class="card-top">
+            <span class="act-num">ACT-10</span>
+            <div class="card-arrow">↗</div>
+          </div>
+          <div class="card-title">Memoria Virtual</div>
+          <div class="card-desc">Concepto de memoria virtual, demanda de páginas, page fault y el thrashing. Implementación del espacio de intercambio (swap) en disco.</div>
+          <div class="card-footer">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            Ver en Drive
+          </div>
+        </a>
+
+        <a class="card" href="https://drive.google.com/ACTIVIDAD_11" target="_blank" rel="noopener">
+          <div class="card-top">
+            <span class="act-num">ACT-11</span>
+            <div class="card-arrow">↗</div>
+          </div>
+          <div class="card-title">Algoritmos de Reemplazo de Páginas</div>
+          <div class="card-desc">Comparativa de OPT, FIFO, LRU y Clock. Simulaciones con cadenas de referencia y análisis del número óptimo de marcos de página.</div>
+          <div class="card-footer">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            Ver en Drive
+          </div>
+        </a>
+
+        <a class="card" href="https://drive.google.com/ACTIVIDAD_12" target="_blank" rel="noopener">
+          <div class="card-top">
+            <span class="act-num">ACT-12</span>
+            <div class="card-arrow">↗</div>
+          </div>
+          <div class="card-title">Sistemas de Archivos</div>
+          <div class="card-desc">Estructura y organización de sistemas de archivos FAT, NTFS y ext4. Operaciones sobre archivos y directorios, permisos y metadatos.</div>
+          <div class="card-footer">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            Ver en Drive
+          </div>
+        </a>
+
+        <a class="card" href="https://drive.google.com/ACTIVIDAD_13" target="_blank" rel="noopener">
+          <div class="card-top">
+            <span class="act-num">ACT-13</span>
+            <div class="card-arrow">↗</div>
+          </div>
+          <div class="card-title">Gestión de Entrada/Salida</div>
+          <div class="card-desc">Subsistema de E/S del SO, controladores de dispositivos, interrupciones, DMA y técnicas de buffering y caché de disco para optimizar el rendimiento.</div>
+          <div class="card-footer">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            Ver en Drive
+          </div>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- ══════════════ UNIDAD 3 ══════════════ -->
+    <section class="unit unit-3">
+      <div class="unit-header">
+        <span class="unit-pill">UNIDAD 03</span>
+        <h2 class="unit-title">Seguridad, Redes y Sistemas Distribuidos</h2>
+        <div class="unit-line"></div>
+      </div>
+
+      <div class="cards-grid">
+
+        <a class="card" href="https://drive.google.com/ACTIVIDAD_14" target="_blank" rel="noopener">
+          <div class="card-top">
+            <span class="act-num">ACT-14</span>
+            <div class="card-arrow">↗</div>
+          </div>
+          <div class="card-title">Interbloqueo (Deadlock)</div>
+          <div class="card-desc">Condiciones de Coffman para el interbloqueo, grafo de asignación de recursos, algoritmo del banquero para prevención y estrategias de detección y recuperación.</div>
+          <div class="card-footer">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            Ver en Drive
+          </div>
+        </a>
+
+        <a class="card" href="https://drive.google.com/ACTIVIDAD_15" target="_blank" rel="noopener">
+          <div class="card-top">
+            <span class="act-num">ACT-15</span>
+            <div class="card-arrow">↗</div>
+          </div>
+          <div class="card-title">Seguridad en Sistemas Operativos</div>
+          <div class="card-desc">Modelos de protección, autenticación, control de acceso (DAC/MAC/RBAC), amenazas comunes como malware y exploits, y mecanismos de defensa del SO.</div>
+          <div class="card-footer">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            Ver en Drive
+          </div>
+        </a>
+
+        <a class="card" href="https://drive.google.com/ACTIVIDAD_16" target="_blank" rel="noopener">
+          <div class="card-top">
+            <span class="act-num">ACT-16</span>
+            <div class="card-arrow">↗</div>
+          </div>
+          <div class="card-title">Sistemas Operativos en Red</div>
+          <div class="card-desc">Servicios de red ofrecidos por el SO: DNS, DHCP, compartición de recursos. Diferencia entre SO en red y SO distribuidos, con casos de uso reales.</div>
+          <div class="card-footer">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            Ver en Drive
+          </div>
+        </a>
+
+        <a class="card" href="https://drive.google.com/ACTIVIDAD_17" target="_blank" rel="noopener">
+          <div class="card-top">
+            <span class="act-num">ACT-17</span>
+            <div class="card-arrow">↗</div>
+          </div>
+          <div class="card-title">Virtualización y Contenedores</div>
+          <div class="card-desc">Hypervisores tipo 1 y 2, máquinas virtuales vs contenedores (Docker). Impacto de la virtualización en la gestión de recursos y la evolución hacia la nube.</div>
+          <div class="card-footer">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            Ver en Drive
+          </div>
+        </a>
+
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Portafolio de Actividades &nbsp;·&nbsp; Sistemas Operativos &nbsp;·&nbsp; <span style="color:var(--accent1)">2025</span></p>
+  </footer>
+
+  <script>
+    // Intersection Observer para animar secciones al hacer scroll
+    const units = document.querySelectorAll('.unit');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          // Animar cards con delay escalonado
+          const cards = e.target.querySelectorAll('.card');
+          cards.forEach((card, i) => {
+            card.style.animationDelay = `${i * 0.07}s`;
+            card.style.animation = `cardIn .45s ${i * 0.07}s ease both`;
+          });
+        }
+      });
+    }, { threshold: 0.1 });
+
+    units.forEach(u => observer.observe(u));
+
+    // Inyectar keyframe
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes cardIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+    `;
+    document.head.appendChild(style);
+  </script>
+
+</body>
+</html>
